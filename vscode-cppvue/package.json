@@ -1,0 +1,30 @@
+{
+    "name": "vscode-cppvue",
+    "displayName": "CppVue",
+    "description": "Syntax highlighting for CppVue (.cvue) files",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "cvue",
+            "aliases": ["CppVue", "cvue"],
+            "extensions": [".cvue"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "cvue",
+            "scopeName": "source.cvue",
+            "path": "./syntaxes/cvue.tmLanguage.json",
+            "embeddedLanguages": {
+                "text.html": "html",
+                "source.cpp": "cpp",
+                "source.css": "css"
+            }
+        }]
+    }
+}

@@ -1,0 +1,178 @@
+<template>
+  <div class="todo-app">
+    <h1>Todo List</h1>
+    
+    <div class="new-todo">
+      <input type="text"
+             v-model="newTodo"
+             @keyup.enter="addTodo"
+             placeholder="What needs to be done?">
+    </div>
+    
+    <div class="todo-list">
+      <todo-item v-for="todo in filteredTodos"
+                :key="todo.id"
+                :todo="todo"
+                @toggle="toggleTodo(todo.id)"
+                @remove="removeTodo(todo.id)"
+                @edit="text => editTodo(todo.id, text)">
+      </todo-item>
+    </div>
+    
+    <div class="todo-footer" v-if="todos.length">
+      <span class="todo-count">
+        {{ activeCount }} items left
+      </span>
+      
+      <div class="filters">
+        <a href="#" 
+           :class="{ selected: filter === 'all' }"
+           @click="setFilter('all')">All</a>
+        <a href="#"
+           :class="{ selected: filter === 'active' }"
+           @click="setFilter('active')">Active</a>
+        <a href="#"
+           :class="{ selected: filter === 'completed' }"
+           @click="setFilter('completed')">Completed</a>
+      </div>
+      
+      <button class="clear-completed"
+              v-if="todos.length > activeCount"
+              @click="clearCompleted">
+        Clear completed
+      </button>
+    </div>
+  </div>
+</template>
+
+<script>
+#include <cppvue/app.hpp>
+#include "store/todo_store.hpp"
+#include "components/TodoItem.cvue"
+
+class App : public cppvue::Component {
+public:
+    void setup() {
+        store = useStore<TodoStore>();
+        newTodo = ref("");
+        
+        // Computed properties
+        todos = computed([this]() {
+            return store->state.todos;
+        });
+        
+        filteredTodos = computed([this]() {
+            return store->filteredTodos();
+        });
+        
+        activeCount = computed([this]() {
+            return store->activeCount();
+        });
+        
+        filter = computed([this]() {
+            return store->state.filter;
+        });
+    }
+    
+    void addTodo() {
+        std::string text = newTodo.value();
+        if (!text.empty()) {
+            store->addTodo(text);
+            newTodo = "";
+        }
+    }
+    
+    void removeTodo(int id) {
+        store->removeTodo(id);
+    }
+    
+    void toggleTodo(int id) {
+        store->toggleTodo(id);
+    }
+    
+    void editTodo(int id, const std::string& text) {
+        if (!text.empty()) {
+            store->editTodo(id, text);
+        } else {
+            store->removeTodo(id);
+        }
+    }
+    
+    void clearCompleted() {
+        store->clearCompleted();
+    }
+    
+    void setFilter(const std::string& newFilter) {
+        store->setFilter(newFilter);
+    }
+    
+private:
+    TodoStore* store;
+    Ref<std::string> newTodo;
+    Computed<std::vector<Todo>> todos;
+    Computed<std::vector<Todo>> filteredTodos;
+    Computed<int> activeCount;
+    Computed<std::string> filter;
+};
+</script>
+
+<style>
+.todo-app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.new-todo {
+    margin-bottom: 2rem;
+}
+
+.new-todo input {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.todo-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid #eee;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+}
+
+.filters a {
+    color: #666;
+    text-decoration: none;
+    padding: 0.3rem 0.7rem;
+    border-radius: 3px;
+}
+
+.filters a.selected {
+    background: #42b983;
+    color: white;
+}
+
+.clear-completed {
+    border: none;
+    background: none;
+    color: #999;
+    cursor: pointer;
+}
+
+.clear-completed:hover {
+    text-decoration: underline;
+}
+</style>
