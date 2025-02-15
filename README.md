@@ -39,7 +39,7 @@ source ./emsdk_env.sh
 ### Installation du framework
 
 ```bash
-git clone https://github.com/yourusername/cppvue.git
+git clone https://github.com/d-yatss/CppVue.git
 cd cppvue
 mkdir build && cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
